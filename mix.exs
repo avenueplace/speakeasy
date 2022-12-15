@@ -4,7 +4,7 @@ defmodule Speakeasy.MixProject do
   def project do
     [
       app: :speakeasy,
-      version: "0.3.2",
+      version: "0.4.0",
       elixir: "~> 1.3",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
@@ -30,10 +30,10 @@ defmodule Speakeasy.MixProject do
   defp package do
     [
       name: :speakeasy,
-      maintainers: ["Cory O'Daniel"],
+      maintainers: ["Fernando Mendes", "Nuno Bernardes"],
       licenses: ["MIT"],
       links: %{
-        "GitHub" => "https://github.com/coryodaniel/speakeasy"
+        "GitHub" => "https://github.com/avenueplace/speakeasy"
       }
     ]
   end
