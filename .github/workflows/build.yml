@@ -1,0 +1,52 @@
+name: build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize]
+
+env:
+  CACHE_VERSION: 1
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: OTP ${{matrix.otp}} / Elixir ${{matrix.elixir}}
+    strategy:
+      matrix:
+        otp: ['25.0']
+        elixir: ['1.13.4', '1.14.2']
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: erlef/setup-elixir@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+
+      - name: 'deps cache'
+        uses: actions/cache@v3
+        with:
+          path: deps
+          key: lint-deps-${{env.CACHE_VERSION}}-${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            lint-deps-${{env.CACHE_VERSION}}-${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+            lint-deps-${{env.CACHE_VERSION}}-${{ runner.os }}-mix-
+            lint-deps-${{env.CACHE_VERSION}}-
+
+      - name: '_build cache'
+        uses: actions/cache@v3
+        with:
+          path: _build
+          key: lint-build-${{env.CACHE_VERSION}}-${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            lint-build-${{env.CACHE_VERSION}}-${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+            lint-build-${{env.CACHE_VERSION}}-${{ runner.os }}-mix-
+            lint-build-${{env.CACHE_VERSION}}-
+
+      - run: mix deps.get
+      - run: mix format --check-formatted
+      - run: mix test
