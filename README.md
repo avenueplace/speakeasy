@@ -1,10 +1,11 @@
 # Speakeasy
 
-[![Build Status](https://travis-ci.org/coryodaniel/speakeasy.svg?branch=master)](https://travis-ci.org/coryodaniel/speakeasy)
-[![Coverage Status](https://coveralls.io/repos/github/coryodaniel/speakeasy/badge.svg?branch=master)](https://coveralls.io/github/coryodaniel/speakeasy?branch=master)
-[![Hex.pm](http://img.shields.io/hexpm/v/speakeasy.svg?style=flat)](https://hex.pm/packages/speakeasy) [![Hex.pm](https://img.shields.io/hexpm/dt/speakeasy.svg?style=flat)](https://hex.pm/packages/speakeasy)
-[![Documentation](https://img.shields.io/badge/documentation-on%20hexdocs-green.svg)](https://hexdocs.pm/speakeasy/)
-![Hex.pm](https://img.shields.io/hexpm/l/speakeasy.svg?style=flat)
+[![build](https://github.com/avenueplace/speakeasy/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/avenueplace/speakeasy/actions/workflows/build.yml)
+
+> This project was forked from [coryodaniel/speakeasy] and its maintenance is focused
+> on our internal usage at Avenue. Feel free to use it as is, and reach out to
+> us through an issue or pull-request. We'll gladly consider your suggestions
+> and contributions.
 
 [Speakeasy](https://hexdocs.pm/speakeasy/readme.html) is authentication agnostic middleware based authorization for [Absinthe](https://hexdocs.pm/absinthe) GraphQL powered by [Bodyguard](https://hexdocs.pm/bodyguard).
 
@@ -18,7 +19,7 @@ by adding `speakeasy` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:speakeasy, "~> 0.3"}
+    {:speakeasy, github: "avenueplace/speakeasy", tag: "~> 0.4"}
   ]
 end
 ```
@@ -30,7 +31,7 @@ Configuration can be done in each Absinthe middleware call, but you can set glob
 ```elixir
 config :speakeasy,
   user_key: :current_user,                # the key the current user will be under in the GraphQL context
-  authn_error_message: :unauthenticated  # default authentication failure message
+  authn_error_message: :unauthenticated   # default authentication failure message
 ```
 
 _Note:_ no `authz_error_message` is provided because it is set from Bodyguard.
@@ -109,6 +110,36 @@ field :post, type: :post do
 end
 ```
 
+### Differences from [coryodaniel/speakeasy]
+
+The main difference in this fork is the added support of "[#13 - Allow Authn to bypass nil users, given an option](https://github.com/coryodaniel/speakeasy/pull/13)".
+
+> NOTE: At the time of this fork, `#13` was open. As we need to support this
+> internally, we opted to fork and release a tagged version on GitHub. If and
+> when `#13` (or an equivalent fix) is merged, we **highly** recommend using the
+> [main version](https://github.com/coryodaniel/speakeasy) of Speakeasy.
+
+This PR adds a new `require: boolean` option to `Speakeasy.Authn`, allowing for
+the `current_user` to be `nil` when `require` is set to `false`. The main
+purposes is to facilitate the usage of API calls that can be made both
+authenticated and unauthenticated.
+
+Example:
+
+```elixir
+object :post_mutations do
+  @desc "Create post"
+  field :create_post, type: :post do
+    arg(:name, non_null(:string))
+    middleware(Speakeasy.Authn, require: false)
+  end
+end
+```
+
+Note that the `current_user` value then passed to `Speakeasy.Authz`,
+`Speakeasy.Resolve` and subsequent middlewares can be `nil` and you should take
+steps to verify this.
+
 ### Middleware
 
 Speakeasy is a collection of Absinthe middleware:
@@ -138,3 +169,5 @@ defmodule MyAppWeb.Router do
   end
 end
 ```
+
+[coryodaniel/speakeasy]: https://github.com/coryodaniel/speakeasy
