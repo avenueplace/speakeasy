@@ -43,7 +43,9 @@ defmodule Speakeasy.LoadResourceTest do
     test "updates the resolution's context with the results of loader.(args, user, ctx)" do
       resolution = mock_resolution()
 
-      loader = fn attrs, user, ctx -> {:ok, "#{user} and #{ctx[:current_user]}'s #{attrs[:name]}"} end
+      loader = fn attrs, user, ctx ->
+        {:ok, "#{user} and #{ctx[:current_user]}'s #{attrs[:name]}"}
+      end
 
       %{context: %{speakeasy: context}} = LoadResource.call(resolution, loader)
       assert context == %Speakeasy.Context{resource: "chauncy and chauncy's foo", user: "chauncy"}
