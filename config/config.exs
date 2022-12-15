@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :speakeasy,
   user_key: :current_user,
