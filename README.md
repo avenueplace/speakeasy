@@ -19,7 +19,7 @@ by adding `speakeasy` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:speakeasy, github: "avenueplace/speakeasy", tag: "~> 0.4"}
+    {:speakeasy, github: "avenueplace/speakeasy", tag: "0.4"}
   ]
 end
 ```
